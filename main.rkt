@@ -30,7 +30,10 @@
    
    [("api" "delete-account" (string-arg))
     #:method "get"
-    delete-account]
+    mdelete-account]
+   [("api" "delete-group" (string-arg) (string-arg))
+    #:method "get"
+    mdelete-group]
 
    [("api" "save-group")
     #:method "post"

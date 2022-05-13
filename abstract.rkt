@@ -18,7 +18,8 @@
  get-account
  save-account
  save-group
- delete-account
+ mdelete-account
+ mdelete-group
  get-groups-by-account)
 
 ;;; do login
@@ -157,11 +158,22 @@
      (response/json (hasheq 'code 500 'msg "parameter error"))]))
 
 ;;; delete `account`
-(define (delete-account req account)
+(define (mdelete-account req account)
   (cond
     [(query-account account)
      (cond
        [(delete-account account)
+        (response/json (hasheq 'code 200 'msg "delete account successfull"))]
+       [else
+        (response/json (hasheq 'code 500 'msg "delete account occurred error"))])]
+    [else
+     (response/json (hasheq 'code 400 'msg "account does not exists."))]))
+
+(define (mdelete-group req account group-id)
+  (cond
+    [(query-group account group-id)
+     (cond
+       [(delete-account account group-id)
         (response/json (hasheq 'code 200 'msg "delete account successfull"))]
        [else
         (response/json (hasheq 'code 500 'msg "delete account occurred error"))])]

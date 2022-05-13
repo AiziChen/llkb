@@ -142,10 +142,11 @@
 
 ;;; DELETE
 ;;; delete group by id
-(define (delete-group group-id)
+(define (delete-group account group-id)
   (query-exec *llkb-connect*
               (delete (~> (from group #:as g)
-                          (where (= g.group-id ,group-id))))))
+                          (where (and (= g.group-id ,group-id)
+                                      (= g.account ,account)))))))
 ;;; delete group by name
 (define (delete-group-by-name group-name)
   (query-exec *llkb-connect*
