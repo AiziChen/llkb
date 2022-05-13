@@ -29,7 +29,8 @@
  delete-group-by-name)
 
 (define-schema group
-  ([group-id string/f #:contract non-empty-string? #:primary-key]
+  ([id id/f #:auto-increment #:primary-key]
+   [group-id string/f #:contract non-empty-string?]
    [group-name string/f #:contract non-empty-string?]
    [user-name1 string/f #:nullable]
    [user-id1 string/f #:nullable]
