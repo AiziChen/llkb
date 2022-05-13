@@ -107,7 +107,7 @@
   (cond
     [(query-account account)
      (cond
-       [(update-password password)
+       [(update-password account password)
         (response/json (hasheq 'code 200 'msg "update password successful"))]
        [else
         (response/json (hasheq 'code 500 'msg "update password failed."))])]
@@ -174,11 +174,11 @@
     [(query-group account group-id)
      (cond
        [(delete-group account group-id)
-        (response/json (hasheq 'code 200 'msg "delete account successfull"))]
+        (response/json (hasheq 'code 200 'msg "delete group successfull"))]
        [else
-        (response/json (hasheq 'code 500 'msg "delete account occurred error"))])]
+        (response/json (hasheq 'code 500 'msg "delete group occurred error"))])]
     [else
-     (response/json (hasheq 'code 400 'msg "account does not exists."))]))
+     (response/json (hasheq 'code 400 'msg "group does not exists."))]))
 
 
 ;;; get groups by account
