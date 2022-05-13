@@ -126,6 +126,7 @@
          (cond
            [(query-group (hash-ref group 'group-id #f))
             (update-group
+             (hash-ref group 'account #f)
              (hash-ref group 'group-id #f)
              (hash-ref group 'group-name #f)
              (hash-ref group 'user-name1 sql-null)

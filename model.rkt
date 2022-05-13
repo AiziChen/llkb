@@ -106,7 +106,8 @@
 
 ;;; UPDATE
 ;;; update group
-(define (update-group group-id group-name
+(define (update-group account
+                      group-id group-name
                       [user-name1 sql-null]
                       [user-id1 sql-null]
                       [user-name2 sql-null]
@@ -126,7 +127,8 @@
                [user-id1 ,user-id1]
                [user-name2 ,user-name2]
                [user-id2 ,user-id2])
-       (where (= g.group-id ,group-id)))))
+       (where (and (= g.group-id ,group-id)
+                   (= g.account ,account))))))
 
 ;;; update password
 (define (update-password account password)
