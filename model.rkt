@@ -86,10 +86,11 @@
 
 ;;; QUERY
 ;;; query group
-(define (query-group group-id)
+(define (query-group account group-id)
   (lookup *llkb-connect*
           (~> (from group #:as g)
-              (where (= g.group-id ,group-id)))))
+              (where (and (= g.group-id ,group-id)
+                          (= g.account ,account))))))
 ;;; query group by `account-id`
 (define (query-groups-by-account account)
   (in-entities *llkb-connect*

@@ -124,7 +124,7 @@
      (lambda (group)
        (define rs
          (cond
-           [(query-group (hash-ref group 'group-id #f))
+           [(query-group (hash-ref group 'account #f) (hash-ref group 'group-id #f))
             (update-group
              (hash-ref group 'account #f)
              (hash-ref group 'group-id #f)
