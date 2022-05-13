@@ -173,7 +173,7 @@
   (cond
     [(query-group account group-id)
      (cond
-       [(delete-account account group-id)
+       [(delete-group account group-id)
         (response/json (hasheq 'code 200 'msg "delete account successfull"))]
        [else
         (response/json (hasheq 'code 500 'msg "delete account occurred error"))])]
