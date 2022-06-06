@@ -97,7 +97,7 @@
     [(query-group account-id group-id)
      =>
      (lambda (group)
-       (if (mdelete-group account-id group-id)
+       (if (delete-group account-id group-id)
            (response/json (hasheq 'code 200 'msg "delete group successfully"))
            (response/json (hasheq 'code 500 'msg "delete group failed"))))]
     [else
