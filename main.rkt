@@ -21,18 +21,17 @@
     #:method "post"
     save-group]
 
-   [("api" "get-group" (string-arg))
+   [("api" "get-group" (string-arg) (string-arg))
     #:method "get"
     get-group]
-
-   [("api" "delete-group" (string-arg))
-    #:method "get"
-    mdelete-group]
    
-   
-   [("api" "get-groups")
+   [("api" "get-groups" (string-arg))
     #:method "get"
-    get-groups]))
+    get-groups]
+   
+   [("api" "delete-group" (string-arg) (string-arg))
+    #:method "get"
+    mdelete-group]))
 
 
 (current-cors-origin "*")

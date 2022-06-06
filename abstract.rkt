@@ -29,6 +29,7 @@
          (cond
            [(query-group (hash-ref group 'group-id #f))
             (update-group
+             (hash-ref group 'account-id #f)
              (hash-ref group 'group-id #f)
              (hash-ref group 'group-name #f)
              (hash-ref group 'msgs "")
@@ -37,6 +38,7 @@
              (hash-ref group 'delay-end 0))]
            [else
             (add-new-group
+             (hash-ref group 'account-id #f)
              (hash-ref group 'group-id #f)
              (hash-ref group 'group-name #f)
              (hash-ref group 'msgs "")
@@ -51,15 +53,16 @@
 
 
 ;;; get groups
-(define (get-groups req)
+(define (get-groups req account-id)
   (cond
-    [(query-groups)
+    [(query-groups account-id)
      =>
      (lambda (groups)
        (response/json
         (hasheq 'code 200
                 'groups (for/list ([group groups])
-                          (hasheq 'group-id (group-group-id group)
+                          (hasheq 'account-id (group-account-id group)
+                                  'group-id (group-group-id group)
                                   'group-name (group-group-name group)
                                   'delay-start (group-delay-start group)
                                   'delay-end (group-delay-end group)
@@ -70,7 +73,7 @@
 
 
 ;;; get group
-(define (get-group req group-id)
+(define (get-group req account-id group-id)
   (cond
     [(query-group group-id)
      =>
@@ -78,24 +81,25 @@
        (response/json
         (hasheq 'code 200
                 'group 
-                     (hasheq 'group-id (group-group-id group)
-                                  'group-name (group-group-name group)
-                                  'delay-start (group-delay-start group)
-                                  'delay-end (group-delay-end group)
-                                  'enabled (group-enabled group)
-                                  'msgs (if (sql-null? (group-msgs group)) "" (group-msgs group))))))]
+                (hasheq 'account-id (group-account-id group)
+                        'group-id (group-group-id group)
+                        'group-name (group-group-name group)
+                        'delay-start (group-delay-start group)
+                        'delay-end (group-delay-end group)
+                        'enabled (group-enabled group)
+                        'msgs (if (sql-null? (group-msgs group)) "" (group-msgs group))))))]
     [else
      (response/json (hasheq 'code 500 'msg "get group ocurred error"))]))
 
 ;; delete group
-(define (mdelete-group req group-id)
+(define (mdelete-group req account-id group-id)
   (cond
-    [(query-group group-id)
+    [(query-group account-id group-id)
      =>
      (lambda (group)
-       (if (mdelete-group group-id)
-         (response/json (hasheq 'code 200 'msg "delete group successfully"))
-         (response/json (hasheq 'code 500 'msg "delete group failed"))))]
+       (if (mdelete-group account-id group-id)
+           (response/json (hasheq 'code 200 'msg "delete group successfully"))
+           (response/json (hasheq 'code 500 'msg "delete group failed"))))]
     [else
-      (response/json (hasheq 'code 500 'msg "delete group failed: group not found"))]))
+     (response/json (hasheq 'code 500 'msg "delete group failed: group not found"))]))
 
