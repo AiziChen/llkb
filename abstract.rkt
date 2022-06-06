@@ -27,7 +27,7 @@
      (lambda (group)
        (define rs
          (cond
-           [(query-group (hash-ref group 'group-id #f))
+           [(query-group (hash-ref group 'account-id) (hash-ref group 'group-id #f))
             (update-group
              (hash-ref group 'account-id #f)
              (hash-ref group 'group-id #f)
@@ -75,7 +75,7 @@
 ;;; get group
 (define (get-group req account-id group-id)
   (cond
-    [(query-group group-id)
+    [(query-group account-id group-id)
      =>
      (lambda (group)
        (response/json
