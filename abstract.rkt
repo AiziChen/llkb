@@ -14,6 +14,7 @@
 
 (provide
  do-login
+ do-search-user
  get-accounts-all
  get-account
  save-account
@@ -51,7 +52,8 @@
                     (response/json
                      (hasheq 'code 200
                              'data (hasheq 'userid uid
-                                           'token imtoken))))]
+                                           'token token
+                                           'imtoken imtoken))))]
                  [else
                   (response/json
                    (hasheq 'code 500
@@ -67,7 +69,34 @@
     [else
      (response/json
       (hasheq 'code 500
-              'msg "account or password not be null"))]))
+              'msg "account and password can not be empty"))]))
+
+(define (do-search-user req token search-value)
+  (-> request? non-empty-string? non-empty-string? response?)
+  (cond
+    [(and (non-empty-string? token) (non-empty-string? search-value))
+     (define search-rs (user-search token search-value))
+     (cond
+       [(and search-rs (= (hash-ref search-rs 'err -1) 0)
+             (hash-ref search-rs 'data #f))
+        =>
+        (lambda (data)
+          (cond
+            [(= (hash-ref data 'type -1) 0)
+             (response/json (hasheq 'code 200 'type 0 'msg (hash-ref data 'content "user does not exists")))]
+            [else
+             (response/json (hasheq 'code 200
+                                    'type (hash-ref data 'type -1)
+                                    'msg "search success"
+                                    'data (hash-ref data 'info (hasheq))))]))]
+       [else
+        (response/json
+         (hasheq 'code 500
+                 'msg "search user occurred error"))])]
+    [else
+     (response/json
+      (hasheq 'code 500
+              'msg "token and search value can not be empty"))]))
 
 
 ;;; query all accounts
