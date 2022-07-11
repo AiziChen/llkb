@@ -67,7 +67,7 @@
   (serve
    #:dispatch (apply sequencer:make (filter-map values dispatchers))
    #:listen-ip #f
-   #:port 8919))
+   #:port 8929))
 
 (with-handlers
   ([exn:break? (lambda (_) (stop))])

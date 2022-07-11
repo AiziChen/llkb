@@ -28,44 +28,52 @@
   (-> request? non-empty-string? non-empty-string? response?)
   (cond
     [(and (non-empty-string? account) (non-empty-string? password))
-     (define login-rs (app-user-login account password))
+     (define login-check (app-login-check account password))
      (cond
-       [(and login-rs
-             (= (hash-ref login-rs 'err -1) 0)
-             (hash-ref (hash-ref login-rs 'data (hasheq)) 'token #f))
-        =>
-        (lambda (token)
-          (define user-info (get-user-info token))
-          (cond
-            [(and user-info
-                  (= (hash-ref user-info 'err -1) 0)
-                  (hash-ref (hash-ref user-info 'data (hasheq)) 'uid #f))
-             =>
-             (lambda (uid)
-               (define user-token (get-user-token token))
-               (cond
-                 [(and user-token
-                       (= (hash-ref user-token 'err -1) 0)
-                       (hash-ref (hash-ref user-token 'data (hasheq)) 'token #f))
-                  =>
-                  (lambda (imtoken)
-                    (response/json
-                     (hasheq 'code 200
-                             'data (hasheq 'userid uid
-                                           'token token
-                                           'imtoken imtoken))))]
-                 [else
-                  (response/json
-                   (hasheq 'code 500
-                           'msg "get user token error"))]))]
-            [else
-             (response/json
-              (hasheq 'code 500
-                      'msg "get user information error"))]))]
+       [(and login-check
+             (= (hash-ref login-check 'err -1) 0))
+        (define login-rs (app-user-login account password))
+        (cond
+          [(and login-rs
+                (= (hash-ref login-rs 'err -1) 0)
+                (hash-ref (hash-ref login-rs 'data (hasheq)) 'token #f))
+           =>
+           (lambda (token)
+             (define user-info (get-user-info token))
+             (cond
+               [(and user-info
+                     (= (hash-ref user-info 'err -1) 0)
+                     (hash-ref (hash-ref user-info 'data (hasheq)) 'uid #f))
+                =>
+                (lambda (uid)
+                  (define user-token (get-user-token token))
+                  (cond
+                    [(and user-token
+                          (= (hash-ref user-token 'err -1) 0)
+                          (hash-ref (hash-ref user-token 'data (hasheq)) 'token #f))
+                     =>
+                     (lambda (imtoken)
+                       (response/json
+                        (hasheq 'code 200
+                                'data (hasheq 'userid uid
+                                              'token token
+                                              'imtoken imtoken))))]
+                    [else
+                     (response/json
+                      (hasheq 'code 500
+                              'msg "get user token error"))]))]
+               [else
+                (response/json
+                 (hasheq 'code 500
+                         'msg "get user information error"))]))]
+          [else
+           (response/json
+            (hasheq 'code 500
+                    'msg "login error"))])]
        [else
         (response/json
          (hasheq 'code 500
-                 'msg "login error"))])]
+                 'msg "login check error"))])]
     [else
      (response/json
       (hasheq 'code 500
@@ -82,7 +90,7 @@
         =>
         (lambda (data)
           (cond
-            [(= (hash-ref data 'type -1) 0)
+            [(= (hash-ref data 'type 0) 0)
              (response/json (hasheq 'code 200 'type 0 'msg (hash-ref data 'content "user does not exists")))]
             [else
              (response/json (hasheq 'code 200

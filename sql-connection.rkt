@@ -9,7 +9,7 @@
   (virtual-connection
    (connection-pool
     (lambda ()
-      (postgresql-connect #:database "nuobei"
+      (postgresql-connect #:database "cljg"
                           #:user "postgres"
                           #:password "quanyec")))))
 
