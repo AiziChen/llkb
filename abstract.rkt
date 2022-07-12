@@ -40,7 +40,8 @@
           (define check-status (hash-ref check-data 'status -1))
           (response/json
            (hasheq 'code 200
-                   'status (and (number? check-status) (= check-status 0)))))]
+                   'status (or (and (number? check-status) (= check-status 0))
+                               (and (string? check-status) (equal? check-status "0"))))))]
        [else
         (response/json
          (hasheq 'code 500
