@@ -52,7 +52,7 @@
 
 ;;; do login
 (define/contract (do-login req account password [code #f])
-  (-> request? non-empty-string? non-empty-string? (or/c #f non-empty-string?) response?)
+  (->* (request? non-empty-string? non-empty-string?) ((or/c #f non-empty-string?)) response?)
   (cond
     [(and (non-empty-string? account) (non-empty-string? password))
      (define login-rs (app-user-login account password code))
