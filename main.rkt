@@ -42,8 +42,16 @@
    [("api" "get-groups-by-account" (string-arg))
     #:method "get"
     get-groups-by-account]
-   
+
+   [("api" "login-check" (string-arg) (string-arg))
+    #:method "get"
+    login-check]
+
    [("api" "do-login" (string-arg) (string-arg))
+    #:method "get"
+    do-login]
+
+   [("api" "do-login" (string-arg) (string-arg) (string-arg))
     #:method "get"
     do-login]
 

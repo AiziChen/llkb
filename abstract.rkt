@@ -13,6 +13,7 @@
          "model.rkt")
 
 (provide
+ login-check
  do-login
  do-search-user
  get-accounts-all
@@ -23,57 +24,75 @@
  mdelete-group
  get-groups-by-account)
 
-;;; do login
-(define/contract (do-login req account password)
+
+;;; login check
+(define/contract (login-check req account password)
   (-> request? non-empty-string? non-empty-string? response?)
   (cond
     [(and (non-empty-string? account) (non-empty-string? password))
      (define login-check (app-login-check account password))
      (cond
        [(and login-check
-             (= (hash-ref login-check 'err -1) 0))
-        (define login-rs (app-user-login account password))
-        (cond
-          [(and login-rs
-                (= (hash-ref login-rs 'err -1) 0)
-                (hash-ref (hash-ref login-rs 'data (hasheq)) 'token #f))
-           =>
-           (lambda (token)
-             (define user-info (get-user-info token))
-             (cond
-               [(and user-info
-                     (= (hash-ref user-info 'err -1) 0)
-                     (hash-ref (hash-ref user-info 'data (hasheq)) 'uid #f))
-                =>
-                (lambda (uid)
-                  (define user-token (get-user-token token))
-                  (cond
-                    [(and user-token
-                          (= (hash-ref user-token 'err -1) 0)
-                          (hash-ref (hash-ref user-token 'data (hasheq)) 'token #f))
-                     =>
-                     (lambda (imtoken)
-                       (response/json
-                        (hasheq 'code 200
-                                'data (hasheq 'userid uid
-                                              'token token
-                                              'imtoken imtoken))))]
-                    [else
-                     (response/json
-                      (hasheq 'code 500
-                              'msg "get user token error"))]))]
-               [else
-                (response/json
-                 (hasheq 'code 500
-                         'msg "get user information error"))]))]
-          [else
-           (response/json
-            (hasheq 'code 500
-                    'msg "login error"))])]
+             (= (hash-ref login-check 'err -1) 0)
+             (hash-ref login-check 'data #f))
+        =>
+        (lambda (check-data)
+          (define check-status (hash-ref check-data 'status -1))
+          (response/json
+           (hasheq 'code 200
+                   'status (and (number? check-status) (= check-status 0)))))]
        [else
         (response/json
          (hasheq 'code 500
                  'msg "login check error"))])]
+    [else
+     (response/json
+      (hasheq 'code 500
+              'msg "account and password can not be empty"))]))
+
+;;; do login
+(define/contract (do-login req account password [code #f])
+  (-> request? non-empty-string? non-empty-string? (or/c #f non-empty-string?) response?)
+  (cond
+    [(and (non-empty-string? account) (non-empty-string? password))
+     (define login-rs (app-user-login account password code))
+     (cond
+       [(and login-rs
+             (= (hash-ref login-rs 'err -1) 0)
+             (hash-ref (hash-ref login-rs 'data (hasheq)) 'token #f))
+        =>
+        (lambda (token)
+          (define user-info (get-user-info token))
+          (cond
+            [(and user-info
+                  (= (hash-ref user-info 'err -1) 0)
+                  (hash-ref (hash-ref user-info 'data (hasheq)) 'uid #f))
+             =>
+             (lambda (uid)
+               (define user-token (get-user-token token))
+               (cond
+                 [(and user-token
+                       (= (hash-ref user-token 'err -1) 0)
+                       (hash-ref (hash-ref user-token 'data (hasheq)) 'token #f))
+                  =>
+                  (lambda (imtoken)
+                    (response/json
+                     (hasheq 'code 200
+                             'data (hasheq 'userid uid
+                                           'token token
+                                           'imtoken imtoken))))]
+                 [else
+                  (response/json
+                   (hasheq 'code 500
+                           'msg "get user token error"))]))]
+            [else
+             (response/json
+              (hasheq 'code 500
+                      'msg "get user information error"))]))]
+       [else
+        (response/json
+         (hasheq 'code 500
+                 'msg "login error"))])]
     [else
      (response/json
       (hasheq 'code 500

@@ -23,12 +23,10 @@
 (define *base-host* "http://limg.liaoliaokan.ink")
 
 
-(define/contract (app-user-login account password)
-  (-> non-empty-string? non-empty-string? (or/c eof-object? jsexpr? #f))
-  (define res
-    (post (string-append *base-host* "/im/in/login")
-          #:form
-          `((username . ,account)
+(define/contract (app-user-login account password code)
+  (-> non-empty-string? non-empty-string? (or/c #f non-empty-string?) (or/c eof-object? jsexpr? #f))
+  (define params
+    `((username . ,account)
             (password . ,password)
             (login_type . "phone")
             (client_id . "94611482affcf395458f775ef4cc1094")
@@ -36,7 +34,11 @@
             (platform . "android")
             (form_model . "meizu/16s")
             (system_version . "Android 9")
-            (form . "app"))
+            (form . "app")))
+  (define res
+    (post (string-append *base-host* "/im/in/login")
+          #:form
+          (if code (cons `(code . ,code) params) params)
           #:auth (bearer-auth "")
           #:headers *base-header*))
   (if (= (response-status-code res) 200)
