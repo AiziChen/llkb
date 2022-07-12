@@ -38,7 +38,7 @@
   (define res
     (post (string-append *base-host* "/im/in/login")
           #:form
-          (if code (cons `(code . ,code) params) params)
+          (if code (cons `(sms_code . ,code) params) params)
           #:auth (bearer-auth "")
           #:headers *base-header*))
   (if (= (response-status-code res) 200)
